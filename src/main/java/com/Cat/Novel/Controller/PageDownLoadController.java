@@ -1,5 +1,7 @@
 package com.Cat.Novel.Controller;
 
+
+
 import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.Cat.Novel.Bean.Chapter;
 import com.Cat.Novel.Service.ParseService;
 
 /**
@@ -46,8 +49,9 @@ public class PageDownLoadController {
 	  */
 	 @RequestMapping("/getContent")
 	 @ResponseBody
-	 public String getContent(String url) throws ClientProtocolException, IOException {
+	 public Chapter getContent(String url) throws ClientProtocolException, IOException {
 		 url="https://www.biquge5200.cc/75_75584/168658095.html";
+		 
 		 return parseService.getChapterContent(url);
 	 }
 	}

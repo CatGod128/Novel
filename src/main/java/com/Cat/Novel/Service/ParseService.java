@@ -82,12 +82,14 @@ public class ParseService {
 	 * @throws IOException 
 	 * @throws ClientProtocolException 
 	 */
-	public String getChapterContent(String url) throws ClientProtocolException, IOException {
+	public Chapter getChapterContent(String url) throws ClientProtocolException, IOException {
 		String content="";
+		Chapter chapter=new Chapter();
 		Document doc = HtttpClientUtil.getDoc(url);
+		chapter.setChapterName("第三章  日出");
 		if (null != doc.getElementById("content")) {
-		    content = doc.getElementById("content").text();			
+			chapter.setContent(doc.getElementById("content").toString());		  			
 		}
-		return content;
+		return chapter;
 	}
 }
