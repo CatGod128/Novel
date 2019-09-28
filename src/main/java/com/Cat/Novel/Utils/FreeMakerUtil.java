@@ -3,10 +3,12 @@ package com.Cat.Novel.Utils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
@@ -28,6 +30,7 @@ import freemarker.template.TemplateNotFoundException;
  */
 public class FreeMakerUtil {
 	 private static final Configuration CONFIGURATION = new Configuration(Configuration.VERSION_2_3_22);
+	 private static String path="";
 
 	static{
     	  //这里用来指定模板所在的路径，本项目配置在resources/templates目录下，springBoot项目会默认到resources下读文件
@@ -56,27 +59,36 @@ public class FreeMakerUtil {
 		}
 	}
 	/**
-	 * 输出到输出文件
-	 * @param ftlName   ftl文件名
-	 * @param root		传入的map
-	 * @param outFile	输出后的文件全部路径
-	 * @param filePath	输出前的文件上部路径
+	 * 
+	 * @param ftlName
+	 * @param root
+	 * @param htmlname
+	 * @throws Exception
 	 */
-	public static void printFile(String ftlName, Map<String,Object> root, String outFile, String filePath) throws Exception{
-		try {
-			File file = new File(filePath + outFile);
-			if(!file.getParentFile().exists()){				//判断有没有父路径，就是判断文件整个路径是否存在
-				file.getParentFile().mkdirs();				//不存在就全部创建
-			}
-			Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
-			Template template = getTemplate(ftlName);
-			template.process(root, out);					//模版输出
-			out.flush();
-			out.close();
-		} catch (TemplateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public static void printFile(String ftlName, Map<String,Object> root, String htmlname) throws Exception{
+		   Template template = getTemplate(ftlName);
+		   String path=FreeMakerUtil.class.getClass().getResource("/").toURI().getPath()+"static/"+htmlname+".html";
+		   Writer file = new FileWriter(new File(path.substring(path.indexOf("/"))));
+		   template.process(root, file);    //模板输出
+           file.flush();
+           file.close();
+		
 	}
+	private void freeMarkerContent(Map<String,Object> root){
+        try {
+            Template temp = getTemplate("ChapterInf.ftl");
+            //以classpath下面的static目录作为静态页面的存储目录，同时命名生成的静态html文件名称
+            String path=this.getClass().getResource("/").toURI().getPath()+"static/ChapterInf.html";
+            Writer file = new FileWriter(new File(path.substring(path.indexOf("/"))));
+            temp.process(root, file);
+            file.flush();
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TemplateException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 }

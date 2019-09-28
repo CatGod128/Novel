@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.Cat.Novel.Bean.Chapter;
 import com.Cat.Novel.Bean.Novel;
 import com.Cat.Novel.Service.ParseService;
+import com.Cat.Novel.Utils.FreeMakerUtil;
 import com.Cat.Novel.Utils.HtttpClientUtil;
 import com.Cat.Novel.Utils.ThreadUtils;
 import com.Cat.Novel.Utils.Utils;
@@ -43,7 +44,7 @@ public class MainController {
 	private  ParseService parseService;
 
     @RequestMapping("/query")
-    public String main(Model model,String id) throws ClientProtocolException, IOException{
+    public String main(Model model,String id) throws Exception{
     	 String  url="";
     	if(id.equals("1")){
     		  url="https://www.biquge5200.cc/75_75584/168658095.html";
@@ -55,10 +56,12 @@ public class MainController {
         Map root = new HashMap();
         root.put("ChapterName",chapter.getChapterName());
         root.put("Content", chapter.getContent());
-        freeMarkerContent(root);     
+        FreeMakerUtil.printFile("ChapterInf.ftl", root,"ChapterInf");     
+        FreeMakerUtil.print("ChapterInf.ftl", root);     
         model.addAttribute("ChapterName",chapter.getChapterName()); 
         model.addAttribute("Content",chapter.getContent());
-        return "test";
+        return "ChapterInf";
+    	
     }
 
     private void freeMarkerContent(Map<String,Object> root){

@@ -12,6 +12,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import com.Cat.Novel.Bean.Chapter;
+import com.Cat.Novel.Bean.Novel;
 import com.Cat.Novel.Utils.HtttpClientUtil;
 import com.Cat.Novel.Utils.RegexUtils;
 
@@ -23,8 +24,7 @@ public class ParseService {
 		Elements elements = doc.getElementsByTag("a");
 		for (Element e : elements) {
 			if (e.text().equals("剑来")) {
-				System.out.println(e.attr("href"));
-				openNewPage(e.attr("href"));
+				getChapters(e.attr("href"));
 			}
 		}
 		return 0;
@@ -49,10 +49,11 @@ public class ParseService {
 	 * 打开新的页面
 	 * 
 	 * @param url 网页地址路径            
+	 * @return 
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	public  void openNewPage(String url) throws ClientProtocolException, IOException {
+	public  List<Chapter> getChapters(String url) throws ClientProtocolException, IOException {
 
 		Document doc = HtttpClientUtil.getDoc(url);
 		Elements elements = doc.getElementsByTag("dd");
@@ -70,9 +71,7 @@ public class ParseService {
 				chapter.setRealName(RegexUtils.getChapterName(chapter.getChapterName()).trim());
 				list.add(chapter);
 		}
-		for(Chapter a: list) {
-			System.out.println(a);
-		}
+		return list;
 	}
 	
 	/**
@@ -88,8 +87,28 @@ public class ParseService {
 		Document doc = HtttpClientUtil.getDoc(url);
 		chapter.setChapterName("第三章  日出");
 		if (null != doc.getElementById("content")) {
-			chapter.setContent(doc.getElementById("content").toString());		  			
+			content=doc.getElementById("content").toString();
+		//	content=new String(content.getBytes("iso-8859-1"),"utf-8");
+			chapter.setContent(content);		 
+		
 		}
 		return chapter;
 	}
+	/**
+	 * 解析出小说信息
+	 * @return
+	 * @throws IOException 
+	 * @throws ClientProtocolException 
+	 */
+	public Novel parseNovelName(String url) throws ClientProtocolException, IOException{
+		Novel novel=new Novel();
+		Document doc = HtttpClientUtil.getDoc(url);
+		Elements elements= doc.select("info h1");
+		for(Element e: elements){
+			novel.setNovelName(e.text());
+			System.out.println(novel.getNovelName());
+		}
+		return novel;
+	}
 }
+
