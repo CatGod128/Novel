@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 
 import org.apache.http.client.ClientProtocolException;
 import org.jsoup.nodes.Document;
-import org.junit.Test;
+//import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -56,11 +56,12 @@ public class MainController {
         Map root = new HashMap();
         root.put("ChapterName",chapter.getChapterName());
         root.put("Content", chapter.getContent());
-        FreeMakerUtil.printFile("ChapterInf.ftl", root,"ChapterInf");     
-        FreeMakerUtil.print("ChapterInf.ftl", root);     
+       // FreeMakerUtil.printFile("New.ftl", root,"ChapterInf");     
+     //   FreeMakerUtil.print("New.ftl", root);     
+        freeMarkerContent(root);
         model.addAttribute("ChapterName",chapter.getChapterName()); 
         model.addAttribute("Content",chapter.getContent());
-        return "ChapterInf";
+        return "test";
     	
     }
 
@@ -81,7 +82,7 @@ public class MainController {
             e.printStackTrace();
         }
     }
-    @Test
+/*    @Test
     public  void Test() throws ClientProtocolException, IOException {
     	 List<Novel> noteList = new ArrayList<Novel>();
     		Document doc = HtttpClientUtil.getDoc("https://www.biquge5200.cc/");
@@ -92,7 +93,7 @@ public class MainController {
     			pool.execute(new Thread(new ThreadUtils(noteList.get(i))));
     		}
     		pool.shutdown();
-    	}
+    	}*/
     }
 
 

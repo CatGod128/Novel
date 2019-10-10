@@ -4,6 +4,8 @@ package com.Cat.Novel.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.http.client.ClientProtocolException;
 import org.jsoup.nodes.Document;
@@ -18,16 +20,35 @@ import com.Cat.Novel.Utils.RegexUtils;
 
 @Service
 public class ParseService {
+	
+	
 
-	public  int ParsePage(String url) throws ClientProtocolException, IOException {
+	/**
+	 * 解析网页
+	 * @param url
+	 * @return
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 */
+	public  List<String> ParsePage(String url) throws ClientProtocolException, IOException {
+		Elements elements=null;
 		Document doc = HtttpClientUtil.getDoc(url);
-		Elements elements = doc.getElementsByTag("a");
-		for (Element e : elements) {
-			if (e.text().equals("剑来")) {
-				getChapters(e.attr("href"));
-			}
+		List<String> list =new ArrayList<>();
+		System.out.println(url);
+		if(url.contains("xiaoshuo")) { //小说列表页
+			 elements = doc.select("[class=s2] a");	
+			 for (Element e : elements) {
+					list.add(e.attr("href"));
+					}
+		}else {
+			 elements = doc.select("dd a");	
+			 for (Element e : elements) {
+					list.add(e.attr("href"));
+					}
 		}
-		return 0;
+		
+
+		return list;
 	}
 	/**
 	 * 获取当前小说的章节总数
@@ -46,7 +67,7 @@ public class ParseService {
 	}
 
 	/**
-	 * 打开新的页面
+	 * 解析章节
 	 * 
 	 * @param url 网页地址路径            
 	 * @return 
@@ -100,7 +121,7 @@ public class ParseService {
 	 * @throws IOException 
 	 * @throws ClientProtocolException 
 	 */
-	public Novel parseNovelName(String url) throws ClientProtocolException, IOException{
+	public Novel parseNovel(String url) throws ClientProtocolException, IOException{
 		Novel novel=new Novel();
 		Document doc = HtttpClientUtil.getDoc(url);
 		Elements elements= doc.select("info h1");

@@ -40,7 +40,7 @@ public class ThreadUtils implements Runnable  {
 				try {
 					file.createNewFile();
 				} catch (IOException e) {
-					// TODO 自动生成的 catch 块
+				
 					e.printStackTrace();
 				}
 			} else {
@@ -52,7 +52,7 @@ public class ThreadUtils implements Runnable  {
 			bw.write("   " + novel.getWirterid() + "\r\n");
 			bw.write("***copy@by nice***\r\n");
 			System.out.println(novel.getUrl());
-			Document document = Utils.GetDocument("https://www.biquge5200.cc/75_75584/");
+			Document document = Utils.GetDocument(novel.getUrl());
 			System.out.println(document.toString()+"--");
 			// 获取章节信息的父节点后获取章节节点。
 			Elements element = document.getElementsByTag("dd");
@@ -87,7 +87,7 @@ public class ThreadUtils implements Runnable  {
 			fW.close();
 			
 		} catch (IOException e) {
-			// TODO 自动生成的 catch 块
+		
 			e.printStackTrace();
 		}
  
