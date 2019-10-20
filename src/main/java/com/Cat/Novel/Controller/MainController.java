@@ -1,99 +1,88 @@
 package com.Cat.Novel.Controller;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.annotation.Resource;
-
-import org.apache.http.client.ClientProtocolException;
-import org.jsoup.nodes.Document;
-//import org.junit.Test;
+import com.Cat.Novel.Bean.Chapter;
+import com.Cat.Novel.Bean.Novel;
+import com.Cat.Novel.Service.ParseService;
+import com.Cat.Novel.Service.QueryService;
+import com.Cat.Novel.Utils.FreeMakerUtil;
+import freemarker.template.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.Cat.Novel.Bean.Chapter;
-import com.Cat.Novel.Bean.Novel;
-import com.Cat.Novel.Service.ParseService;
-import com.Cat.Novel.Utils.FreeMakerUtil;
-import com.Cat.Novel.Utils.HtttpClientUtil;
-import com.Cat.Novel.Utils.ThreadUtils;
-import com.Cat.Novel.Utils.Utils;
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.*;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
+/**
+ * 前台访问
+ * Mr.Cat
+ */
 
 @Controller
 
 public class MainController {
 
-    @Resource
-    Configuration cfg;
+
     @Autowired
 	private  ParseService parseService;
+    @Autowired
+    private QueryService queryService;
 
-    @RequestMapping("/query")
-    public String main(Model model,String id) throws Exception{
-    	 String  url="";
-    	if(id.equals("1")){
-    		  url="https://www.biquge5200.cc/75_75584/168658095.html";
-    	}else {
-    		  url="https://www.biquge5200.cc/75_75584/168615131.html";
-    	}
-       
-        Chapter chapter=parseService.getChapterContent(url);
+    /**
+     * 访问章节内容
+     * @param model
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/queryChapterInfo")
+    public String queryChapterInfo(Model model,String id) throws Exception{
+        Chapter  chapter=queryService.queryChapterUrl(id);
+        chapter.setContent(parseService.getChapterContent(chapter.getUrl()));
         Map root = new HashMap();
         root.put("ChapterName",chapter.getChapterName());
         root.put("Content", chapter.getContent());
-       // FreeMakerUtil.printFile("New.ftl", root,"ChapterInf");     
-     //   FreeMakerUtil.print("New.ftl", root);     
-        freeMarkerContent(root);
-        model.addAttribute("ChapterName",chapter.getChapterName()); 
+        root.put("NovelId", chapter.getNovelId());
+        root.put("privousId", chapter.getPrivousId());
+        root.put("nextId", chapter.getNextId());
+        FreeMakerUtil.printFile("ChapterInf.ftl", root,"ChapterInf");
+      //  FreeMakerUtil.print("ChapterInf.ftl", root);
+        model.addAttribute("ChapterName",chapter.getChapterName());
         model.addAttribute("Content",chapter.getContent());
-        return "test";
-    	
+        model.addAttribute("NovelId",chapter.getNovelId());
+        model.addAttribute("privousId", chapter.getPrivousId());
+        model.addAttribute("nextId",chapter.getNextId());
+        return "ChapterInf";
     }
 
-    private void freeMarkerContent(Map<String,Object> root){
-        try {
-            Template temp = cfg.getTemplate("New.ftl");
-            //以classpath下面的static目录作为静态页面的存储目录，同时命名生成的静态html文件名称
-            String path=this.getClass().getResource("/").toURI().getPath()+"static/test.html";
-            Writer file = new FileWriter(new File(path.substring(path.indexOf("/"))));
-            temp.process(root, file);
-            file.flush();
-            file.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TemplateException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+    /**
+     * 访问小说章节
+     * @param model
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/queryNovelInfo")
+    public String queryNovelInfo(Model model,String id) throws Exception{
+       // Novel novel=queryService.queryNovel(id);
+        Novel novel =new Novel();
+        novel.setNovelName("剑来");
+        List<Chapter> chapterList=queryService.queryChapterList(id);
+        Map root = new HashMap();
+        root.put("NovelName",novel.getNovelName());
+        root.put("ChapterList", chapterList);
+        FreeMakerUtil.printFile("NovelInfo.ftl", root,"NovelInfo");
+       // FreeMakerUtil.print("ChapterInf.ftl", root);
+        model.addAttribute("NovelName",novel.getNovelName());
+        model.addAttribute("ChapterList",chapterList);
+        return "NovelInfo";
     }
-/*    @Test
-    public  void Test() throws ClientProtocolException, IOException {
-    	 List<Novel> noteList = new ArrayList<Novel>();
-    		Document doc = HtttpClientUtil.getDoc("https://www.biquge5200.cc/");
-    		noteList = Utils.getNotename(doc);
-    		System.out.println(noteList.size());
-    		ExecutorService pool = Executors.newFixedThreadPool(10);
-    		for (int i = 0; i < 1; i++) {
-    			pool.execute(new Thread(new ThreadUtils(noteList.get(i))));
-    		}
-    		pool.shutdown();
-    	}*/
+
+
+
     }
 
 

@@ -7,15 +7,15 @@ package com.Cat.Novel.Bean;
  */
 public class Novel {
 
-	private int id;                        //小说id
+	private String id;                        //小说id
 	private String url;                    //小说路径
 	private String novelName;              //书名
 	private String ImgUrl;                 //书面封皮
 	private String wirterid;               //写手id
-	public int getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getUrl() {

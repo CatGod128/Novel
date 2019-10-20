@@ -2,15 +2,14 @@ package com.Cat.Novel.Service;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.http.client.ClientProtocolException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.Cat.Novel.Bean.Chapter;
@@ -20,8 +19,11 @@ import com.Cat.Novel.Utils.RegexUtils;
 
 @Service
 public class ParseService {
-	
-	
+
+	@Autowired
+	private StoreService storeService;
+	@Autowired
+	private QueryService queryService;
 
 	/**
 	 * 解析网页
@@ -34,7 +36,7 @@ public class ParseService {
 		Elements elements=null;
 		Document doc = HtttpClientUtil.getDoc(url);
 		List<String> list =new ArrayList<>();
-		System.out.println(url);
+		System.out.println("1245"+url);
 		if(url.contains("xiaoshuo")) { //小说列表页
 			 elements = doc.select("[class=s2] a");	
 			 for (Element e : elements) {
@@ -46,8 +48,6 @@ public class ParseService {
 					list.add(e.attr("href"));
 					}
 		}
-		
-
 		return list;
 	}
 	/**
@@ -74,25 +74,48 @@ public class ParseService {
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	public  List<Chapter> getChapters(String url) throws ClientProtocolException, IOException {
+	public  String parseChapters(String url) throws ClientProtocolException, IOException {
 
 		Document doc = HtttpClientUtil.getDoc(url);
 		Elements elements = doc.getElementsByTag("dd");
-		List<Chapter> list=new ArrayList<>();
-	//	System.out.println(doc.toString());
-		// 获取章节总数，便于排序输出
 		int ChapterNums = getChatersNumber(url);
 		for (int i = 10; i < ChapterNums; i++) {
-			
-			String Chapterurl = elements.get(i).select("a").attr("href");
-			Chapter chapter=new Chapter();
-			if (null != Chapterurl && "" != Chapterurl)
+			String  novelId="1";
+			String Chapterurl = elements.get(i).select("a").attr("href");  //本章节路径
+			Map<String,Object> map=new HashMap<>();
+			map.put("orderNum",i-1);
+			map.put("novelId",novelId);
+			String privousId = queryService.getPrivousID(map);     //获取上一章ID
+			Chapter chapter = new Chapter();
+			if (null != Chapterurl && "" != Chapterurl) {
+		     	chapter.setId(UUID.randomUUID().toString());
+				chapter.setNovelId("1");
 				chapter.setChapterName(elements.get(i).text());
 				chapter.setUrl(Chapterurl);
+				chapter.setPrivousId(privousId);
+				chapter.setOrderNum(i);
 				chapter.setRealName(RegexUtils.getChapterName(chapter.getChapterName()).trim());
-				list.add(chapter);
-		}
-		return list;
+			 	int isExist = queryService.isExistChapter(chapter.getChapterName());
+			 	if(isExist==0){
+					//存储数据
+					int flag=storeService.saveChapter(chapter);
+					if(i>10){
+						Map<String,Object> nextmap=new HashMap<>();
+						nextmap.put("novelId",novelId);
+						nextmap.put("orderNum",i-1);
+						nextmap.put("nextId",chapter.getId());
+						int falg=storeService.saveNextId(nextmap);
+					}
+
+
+				}
+				else if(isExist>1){
+					System.out.println(chapter);
+				}else{
+					continue;
+				}
+			}
+		} return "list";
 	}
 	
 	/**
@@ -102,18 +125,13 @@ public class ParseService {
 	 * @throws IOException 
 	 * @throws ClientProtocolException 
 	 */
-	public Chapter getChapterContent(String url) throws ClientProtocolException, IOException {
+	public String  getChapterContent(String url) throws ClientProtocolException, IOException {
 		String content="";
-		Chapter chapter=new Chapter();
 		Document doc = HtttpClientUtil.getDoc(url);
-		chapter.setChapterName("第三章  日出");
 		if (null != doc.getElementById("content")) {
 			content=doc.getElementById("content").toString();
-		//	content=new String(content.getBytes("iso-8859-1"),"utf-8");
-			chapter.setContent(content);		 
-		
 		}
-		return chapter;
+		return content;
 	}
 	/**
 	 * 解析出小说信息

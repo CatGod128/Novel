@@ -23,24 +23,24 @@ public class ThreadUtils implements Runnable  {
 
 	private Novel novel;
 	List<Chapter> chapList = new ArrayList<Chapter>();
- 
+
 	public ThreadUtils(Novel novel) throws IOException {
-		
+
 		this.novel = novel;
-	
+
 	}
- 
+
 	@Override
 	public void run() {
 		try {
-			
+
 			// 创建文件
 			File file = new File("D:\\剑来\\" + novel.getNovelName() + ".txt");
 			if (!file.exists()) {
 				try {
 					file.createNewFile();
 				} catch (IOException e) {
-				
+
 					e.printStackTrace();
 				}
 			} else {
@@ -56,17 +56,17 @@ public class ThreadUtils implements Runnable  {
 			System.out.println(document.toString()+"--");
 			// 获取章节信息的父节点后获取章节节点。
 			Elements element = document.getElementsByTag("dd");
-		
+
 			for (Element e : element) {
 				Chapter cInfo = new Chapter();
-                String url=e.select("a").attr("href");
+				String url=e.select("a").attr("href");
 				// 给chapterUrl和chapterName赋值
 				cInfo.setChapterName(e.text());
 				cInfo.setUrl(url);
-                System.out.println("111");
+				System.out.println("111");
 				// 获取chapterText
 				Document document2 = HtttpClientUtil.getDoc(url);
- 
+
 				// 控制txt文本的格式。
 				String list = "  ";
 				Element element3 = document2.getElementById("content");
@@ -77,20 +77,20 @@ public class ThreadUtils implements Runnable  {
 				}
 				chapList.add(cInfo);
 			}
- 
-			
+
+
 			for (Chapter c : chapList) {
 				bw.write(c.getChapterName() + "\r\n");
 				bw.write(c.getContent() + "\r\n");
 			}
 			bw.close();
 			fW.close();
-			
+
 		} catch (IOException e) {
-		
+
 			e.printStackTrace();
 		}
- 
+
 	}
 
 }

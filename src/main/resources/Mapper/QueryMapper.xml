@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.Cat.Novel.Mapper.QueryMapper" >
+<!-- 获取章节路径-->
+<select id="queryChapterUrl" parameterType="String" resultType="Chapter">
+	select * from  Chapter where id=#{id}
+</select>
+	<!-- 获取章节列表-->
+<select id="queryChapterList" parameterType="String" resultType="Chapter">
+	select * from Chapter where novelId=#{id} order by orderNum
+</select>
+	<!-- 章节是否存在-->
+	<select id="isExistChapter" parameterType="String" resultType="Int">
+	select COUNT(id) from Chapter where chapterName=#{ChapterName}
+</select>
+
+	<!-- 获取上一章ID-->
+	<select id="getPrivousID" resultType="String">
+	select ifnull(Id,'') from Chapter where novelId=#{novelId} and orderNum=#{orderNum}
+</select>
+
+</mapper>
