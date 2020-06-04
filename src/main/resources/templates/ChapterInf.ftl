@@ -6,14 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,">
 <title> ${ChapterName}
 </title>
-<link href="./static/css/bootstrap.css" rel="stylesheet" type="text/css">
+<link href="../static/css/bootstrap.css" rel="stylesheet" type="text/css">
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
-<link rel="stylesheet" href="./static/css/chapter.css" type="text/css">
+<link rel="stylesheet" href="../static/css/chapter.css" type="text/css">
 </head>
 <body>
 <div class="container-fluid" id="mainDiv" >
@@ -48,9 +48,9 @@
   <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-lg-8 col-lg-offset-2">
       <nav aria-label="...">
         <ul class="pager">
-            <li><a  class="btn btn-lg" onclick="javascript:refreshto('${privousId}')"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> 上一章</a></li>
+            <li><a  class="btn btn-lg" onclick="javascript:refreshto('${privousId!""}')"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> 上一章</a></li>
             <li><a  class="btn btn-lg" onclick="javascript:Home('${NovelId}')"><span class="glyphicon glyphicon-home" aria-hidden="true" ></span> 目 录</a></li>
-            <li><a  class="btn btn-lg" onclick="javascript:refreshto('${nextId}')">下一章<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a></li>
+            <li><a  class="btn btn-lg" onclick="javascript:refreshto('${nextId!""}')">下一章<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a></li>
         </ul>
       </nav>
   </div>
@@ -89,9 +89,9 @@
 </div>
 <!-- 字体加减 段落加减 默认 护眼 仿真 end-->
 </div>
-<script src="./static/js/jquery-1.11.3.min.js"></script>
-<script src="./static/js/bootstrap.js"></script>
-<script src="./static/js/chapter.js"></script>
+<script src="../static/js/jquery-1.11.3.min.js"></script>
+<script src="../static/js/bootstrap.js"></script>
+<script src="../static/js/chapter.js"></script>
 <script>
     function refreshto(id){
          var url ='queryChapterInfo?id='+id;

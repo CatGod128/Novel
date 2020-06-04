@@ -3,13 +3,19 @@ package com.Cat.Novel.Service;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Future;
 
+import com.Cat.Novel.Bean.CrawlerInfo;
 import org.apache.http.client.ClientProtocolException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import com.Cat.Novel.Bean.Chapter;
@@ -17,6 +23,9 @@ import com.Cat.Novel.Bean.Novel;
 import com.Cat.Novel.Utils.HtttpClientUtil;
 import com.Cat.Novel.Utils.RegexUtils;
 
+/**
+ * @author 13001
+ */
 @Service
 public class ParseService {
 
@@ -24,6 +33,10 @@ public class ParseService {
 	private StoreService storeService;
 	@Autowired
 	private QueryService queryService;
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
+
+
 
 	/**
 	 * 解析网页
@@ -36,8 +49,9 @@ public class ParseService {
 		Elements elements=null;
 		Document doc = HtttpClientUtil.getDoc(url);
 		List<String> list =new ArrayList<>();
-		System.out.println("1245"+url);
-		if(url.contains("xiaoshuo")) { //小说列表页
+
+		//小说列表页
+		if(url.contains("xiaoshuo")) {
 			 elements = doc.select("[class=s2] a");	
 			 for (Element e : elements) {
 					list.add(e.attr("href"));
@@ -74,22 +88,27 @@ public class ParseService {
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	public  String parseChapters(String url) throws ClientProtocolException, IOException {
-
+	@Async
+	public Future<CrawlerInfo> parseChapters(String url,CrawlerInfo crawlerInfo) throws ClientProtocolException, IOException {
+		Novel novel=parseNovel(url);
 		Document doc = HtttpClientUtil.getDoc(url);
 		Elements elements = doc.getElementsByTag("dd");
 		int ChapterNums = getChatersNumber(url);
-		for (int i = 10; i < ChapterNums; i++) {
-			String  novelId="1";
-			String Chapterurl = elements.get(i).select("a").attr("href");  //本章节路径
+		for (int i = 0; i < ChapterNums; i++) {
+			String  novelId=novel.getId();
+			//本章节路径
+			String Chapterurl = elements.get(i).select("a").attr("href");
+			if(Chapterurl.startsWith("/")){
+                Chapterurl=url.substring(0,url.indexOf("/",13))+Chapterurl;
+			}
 			Map<String,Object> map=new HashMap<>();
 			map.put("orderNum",i-1);
 			map.put("novelId",novelId);
-			String privousId = queryService.getPrivousID(map);     //获取上一章ID
+			//获取上一章ID
+			String privousId = queryService.getPrivousID(map);
 			Chapter chapter = new Chapter();
 			if (null != Chapterurl && "" != Chapterurl) {
-		     	chapter.setId(UUID.randomUUID().toString());
-				chapter.setNovelId("1");
+				chapter.setNovelId(novelId);
 				chapter.setChapterName(elements.get(i).text());
 				chapter.setUrl(Chapterurl);
 				chapter.setPrivousId(privousId);
@@ -99,15 +118,13 @@ public class ParseService {
 			 	if(isExist==0){
 					//存储数据
 					int flag=storeService.saveChapter(chapter);
-					if(i>10){
+					if(i>0){
 						Map<String,Object> nextmap=new HashMap<>();
 						nextmap.put("novelId",novelId);
 						nextmap.put("orderNum",i-1);
 						nextmap.put("nextId",chapter.getId());
 						int falg=storeService.saveNextId(nextmap);
 					}
-
-
 				}
 				else if(isExist>1){
 					System.out.println(chapter);
@@ -115,7 +132,9 @@ public class ParseService {
 					continue;
 				}
 			}
-		} return "list";
+		}
+		crawlerInfo.setEndDate(new Date());
+		return new AsyncResult<CrawlerInfo> (crawlerInfo);
 	}
 	
 	/**
@@ -141,12 +160,19 @@ public class ParseService {
 	 */
 	public Novel parseNovel(String url) throws ClientProtocolException, IOException{
 		Novel novel=new Novel();
-		Document doc = HtttpClientUtil.getDoc(url);
-		Elements elements= doc.select("info h1");
+		novel.setUrl(url);
+		Document doc = HtttpClientUtil.getDocByConnect(url);
+		Elements elements= doc.getElementsByTag("h1");
 		for(Element e: elements){
 			novel.setNovelName(e.text());
-			System.out.println(novel.getNovelName());
 		}
+		//存储数据库
+		//判断是否存在
+		int isExist =queryService.isExistNovel(novel.getNovelName());
+		if(isExist==0){
+			boolean flag=storeService.saveNovel(novel);
+		}
+		logger.info(novel.toString());
 		return novel;
 	}
 }

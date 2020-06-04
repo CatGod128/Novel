@@ -22,4 +22,8 @@ public interface QueryMapper {
     int isExistChapter(String ChapterName);
 
     String getPrivousID(Map map);
+
+    int isExistNovel(String novelName);
+
+    List<Novel> queryAll();
 }

@@ -2,7 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.Cat.Novel.Mapper.StoreMapper" >
 
-<insert id="saveChapter" parameterType="Chapter">
+<insert id="saveChapter" parameterType="Chapter" >
+	<selectKey keyColumn="id" resultType="String" keyProperty="id" order="AFTER">
+		SELECT LAST_INSERT_ID()
+	</selectKey>
 insert into CHAPTER  (id,chapterName,realName, url,content,novelId,privousId,orderNum
 		)
 		values (
@@ -13,6 +16,16 @@ insert into CHAPTER  (id,chapterName,realName, url,content,novelId,privousId,ord
 
 	<!-- 向上一章插入本章id-->
 	<update id="saveNextID" parameterType="java.util.Map" >
-update CHAPTER set nextId='${nextId}' where novelId=${novelId} and orderNum=${orderNum}
+update CHAPTER set nextId=#{nextId} where novelId=#{novelId} and orderNum=#{orderNum}
 	</update>
+	<insert id="saveNovel" parameterType="Novel" >
+		<selectKey keyColumn="id" resultType="String" keyProperty="id" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into NOVEL  (novelName, url,ImgUrl,wirterid)
+		values (
+		#{novelName},#{url},#{ImgUrl},#{wirterid}
+		)
+
+</insert>
 </mapper>

@@ -4,16 +4,13 @@ import com.Cat.Novel.Bean.Chapter;
 import com.Cat.Novel.Bean.Novel;
 import com.Cat.Novel.Service.ParseService;
 import com.Cat.Novel.Service.QueryService;
-import com.Cat.Novel.Utils.FreeMakerUtil;
-import freemarker.template.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -30,6 +27,8 @@ public class MainController {
 	private  ParseService parseService;
     @Autowired
     private QueryService queryService;
+    //用于 进度条返回计数
+    private static int count=0;
 
     /**
      * 访问章节内容
@@ -48,8 +47,6 @@ public class MainController {
         root.put("NovelId", chapter.getNovelId());
         root.put("privousId", chapter.getPrivousId());
         root.put("nextId", chapter.getNextId());
-        FreeMakerUtil.printFile("ChapterInf.ftl", root,"ChapterInf");
-      //  FreeMakerUtil.print("ChapterInf.ftl", root);
         model.addAttribute("ChapterName",chapter.getChapterName());
         model.addAttribute("Content",chapter.getContent());
         model.addAttribute("NovelId",chapter.getNovelId());
@@ -67,21 +64,54 @@ public class MainController {
      */
     @RequestMapping("/queryNovelInfo")
     public String queryNovelInfo(Model model,String id) throws Exception{
-       // Novel novel=queryService.queryNovel(id);
-        Novel novel =new Novel();
-        novel.setNovelName("剑来");
+        Novel novel=queryService.queryNovel(id);
         List<Chapter> chapterList=queryService.queryChapterList(id);
-        Map root = new HashMap();
-        root.put("NovelName",novel.getNovelName());
-        root.put("ChapterList", chapterList);
-        FreeMakerUtil.printFile("NovelInfo.ftl", root,"NovelInfo");
-       // FreeMakerUtil.print("ChapterInf.ftl", root);
         model.addAttribute("NovelName",novel.getNovelName());
         model.addAttribute("ChapterList",chapterList);
         return "NovelInfo";
     }
 
+    /**
+     * 访问主页
+     * @return
+     */
+   @RequestMapping("/admin")
+    public String index(){
+       return  "index";
+   }
 
+    /**
+     * 用于不用渲染数据的静态页面跳转
+     * @param pageName
+     * @return
+     */
+   @RequestMapping("/queryPage/{pageName}")
+    public String  pageFlow(@PathVariable String pageName){
+       if(pageName.contains("crawl")){
+           return "crawls/"+pageName;
+       }
+       return pageName;
+   }
+
+    /**+
+     * 测试进度条设置
+     * @param Url
+     * @return
+     */
+   @RequestMapping("/testProcess")
+   @ResponseBody
+    public int testProcess(String Url){
+       if(count <= 100){
+           addCount();
+           return  count;
+       }else {
+           return 1000;
+       }
+   }
+
+    public  void addCount(){
+       count++;
+    }
 
     }
 

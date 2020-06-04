@@ -42,4 +42,12 @@ public class QueryService {
     public String getPrivousID(Map map) {
         return queryMapper.getPrivousID(map);
     }
+
+    public int isExistNovel(String novelName) {
+        return queryMapper.isExistNovel(novelName);
+    }
+
+    public List<Novel> queryALL() {
+        return queryMapper.queryAll();
+    }
 }

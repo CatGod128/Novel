@@ -17,9 +17,13 @@ import com.mysql.jdbc.StringUtils;
 @Service
 public class QueueRepositoryService {
 
-	//高优先级
+	/**
+	 *高优先级队列
+	 */
 	private Queue<String> highLevelQueue=new ConcurrentLinkedQueue<String>();
-	//低优先级
+	/**
+	 * 低优先级队列
+	 */
 	private Queue<String> lowLevelQueue=new ConcurrentLinkedQueue<String>();
 	public String poll() {
 		String url=this.highLevelQueue.poll();
@@ -36,5 +40,10 @@ public class QueueRepositoryService {
 	public void addLowLevel(String url) {
 		this.lowLevelQueue.add(url);
 	};
+
+	public int getSize(){
+		System.out.println(this.lowLevelQueue.size()+this.lowLevelQueue.size());
+		return (this.lowLevelQueue.size()+this.lowLevelQueue.size());
+	}
 }
 

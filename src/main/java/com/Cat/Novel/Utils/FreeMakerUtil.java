@@ -68,7 +68,7 @@ public class FreeMakerUtil {
 		   Template template = getTemplate(ftlName);
 		   String path=FreeMakerUtil.class.getClass().getResource("/").toURI().getPath()+"static/"+htmlname+".html";
 		   Writer file = new FileWriter(new File(path.substring(path.indexOf("/"))));
-		   template.process(root, file);    //模板输出
+		   template.process(root, file);
            file.flush();
            file.close();
 	}

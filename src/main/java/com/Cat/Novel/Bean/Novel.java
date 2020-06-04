@@ -1,14 +1,24 @@
 package com.Cat.Novel.Bean;
 
+
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 /**
  * 小说实体类
  * @author 13001
  *
  */
+
 public class Novel {
 
-	private String id;                        //小说id
-	private String url;                    //小说路径
+
+	private String id;
+	//小说路径
+	private String url;
 	private String novelName;              //书名
 	private String ImgUrl;                 //书面封皮
 	private String wirterid;               //写手id

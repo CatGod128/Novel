@@ -7,7 +7,7 @@
 </select>
 	<!-- 获取章节列表-->
 <select id="queryChapterList" parameterType="String" resultType="Chapter">
-	select * from Chapter where novelId=#{id} order by orderNum
+	select  * from Chapter where novelId=#{id} order by orderNum
 </select>
 	<!-- 章节是否存在-->
 	<select id="isExistChapter" parameterType="String" resultType="Int">
@@ -18,5 +18,16 @@
 	<select id="getPrivousID" resultType="String">
 	select ifnull(Id,'') from Chapter where novelId=#{novelId} and orderNum=#{orderNum}
 </select>
-
+	<!-- 小说是否存在-->
+	<select id="isExistNovel" parameterType="String" resultType="Int">
+	select COUNT(id) from Novel where NovelName=#{NovelName}
+</select>
+	<!--查询小说-->
+	<select id="queryNovelInfo" parameterType="String" resultType="Novel">
+	select * from Novel where id=#{id}
+</select>
+	<!--查询小说-->
+	<select id="queryAll"  resultType="Novel">
+	select * from Novel
+</select>
 </mapper>

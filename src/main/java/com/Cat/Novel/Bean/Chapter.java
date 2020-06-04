@@ -1,11 +1,19 @@
 package com.Cat.Novel.Bean;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 /**
  * 章节实体类
  * @author 13001
  *
  */
+
 public class Chapter {
+
+
 
 	private String  id;                 //id
 	private String  chapterName;       //章节名称  如：第二百六十七章  天上月
